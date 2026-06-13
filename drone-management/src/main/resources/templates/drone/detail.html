@@ -1,0 +1,68 @@
+<!--
+  无人机管理系统 — 无人机详情只读页面（detail.html）
+  作用：表现层详情视图，展示单台无人机的完整档案信息。
+  功能：只读展示 Model 中 drone 实体各字段；提供返回列表、跳转编辑等导航链接。
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>无人机详情</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-static-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" th:href="@{/drones}">← 返回列表</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><p class="navbar-text" th:if="${loginName}">当前用户：<span th:text="${loginName}">user</span></p></li>
+                <li><a th:href="@{/logout}">退出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="max-width: 720px;">
+    <div class="page-header">
+        <h3>无人机详情 <small th:text="'ID ' + ${drone.id}">ID</small></h3>
+    </div>
+    <!-- dl/dd 展示实体各属性；时间戳字段由 Thymeleaf #dates 格式化为可读字符串 -->
+    <dl class="dl-horizontal">
+        <dt>名称</dt>
+        <dd th:text="${drone.name}">-</dd>
+        <dt>型号</dt>
+        <dd th:text="${drone.model}">-</dd>
+        <dt>序列号</dt>
+        <dd th:text="${drone.serialNumber}">-</dd>
+        <dt>续航（分钟）</dt>
+        <dd th:text="${drone.maxFlightTime}">-</dd>
+        <dt>最大速度（km/h）</dt>
+        <dd th:text="${drone.maxSpeed}">-</dd>
+        <dt>状态</dt>
+        <dd th:text="${drone.status}">-</dd>
+        <dt>备注</dt>
+        <dd th:text="${drone.remark != null ? drone.remark : '—'}">-</dd>
+        <dt>创建时间</dt>
+        <dd th:if="${drone.createdAt != null}" th:text="${#dates.format(new java.util.Date(drone.createdAt), 'yyyy-MM-dd HH:mm:ss')}">-</dd>
+        <dd th:if="${drone.createdAt == null}">—</dd>
+        <dt>更新时间</dt>
+        <dd th:if="${drone.updatedAt != null}" th:text="${#dates.format(new java.util.Date(drone.updatedAt), 'yyyy-MM-dd HH:mm:ss')}">-</dd>
+        <dd th:if="${drone.updatedAt == null}">—</dd>
+    </dl>
+    <p>
+        <a class="btn btn-default" th:href="@{/drones}">返回列表</a>
+        <a class="btn btn-primary" th:href="@{/drones/edit/{id}(id=${drone.id})}">编辑</a>
+    </p>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>

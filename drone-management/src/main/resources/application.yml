@@ -1,0 +1,30 @@
+# 无人机管理系统 — 主配置文件（application.yml）
+# 作用：Spring Boot 全局默认配置，被各 profile 配置叠加使用。
+# 功能：激活 sqlite profile；配置 Thymeleaf 模板引擎、服务端口、MyBatis 映射路径与驼峰转换、Mapper 日志级别等。
+
+spring:
+  profiles:
+    active: sqlite
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML
+
+server:
+  servlet:
+    context-path: /
+  # 默认 8080；若提示端口占用，可先释放占用进程或启动前设置环境变量 SERVER_PORT（例如 18080）
+  port: ${SERVER_PORT:18083}
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.drone.management.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.drone.management.mapper: DEBUG
+    druid.sql: INFO

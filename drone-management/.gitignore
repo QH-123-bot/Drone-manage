@@ -1,0 +1,17 @@
+# 无人机管理系统 — Git 忽略规则（.gitignore）
+# 作用：指定版本控制不跟踪的文件与目录，避免将构建产物、本地数据库、IDE 配置提交到仓库。
+# 功能：忽略 target/ 编译输出、*.class/*.jar、本地 *.db 与 data/ 目录、.idea 等 IDE 文件及日志。
+
+/target/
+*.class
+*.jar
+*.war
+*.ear
+*.db
+*.log
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+/data/

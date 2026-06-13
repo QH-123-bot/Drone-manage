@@ -1,0 +1,53 @@
+<!--
+  无人机管理系统 — 登录页面模板（login.html）
+  作用：表现层视图，用户访问系统时的认证入口页面。
+  功能：展示用户名/密码表单，提交至 POST /login；显示登录失败 flash 提示；与 Shiro loginUrl、AuthPaths.LOGIN 一致。
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>登录 - 无人机管理系统</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+    <style>
+        body { background: #f5f5f5; }
+        .login-box { max-width: 400px; margin: 10% auto 0; }
+    </style>
+</head>
+<body>
+<div class="container login-box">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">无人机管理系统</h3>
+        </div>
+        <div class="panel-body">
+            <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">错误提示</div>
+            <!-- name 必须为 username/password，与 LoginController @RequestParam 一致 -->
+            <form th:action="@{/login}" method="post" accept-charset="UTF-8" enctype="application/x-www-form-urlencoded">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" class="form-control" id="username" name="username" required
+                           placeholder="请输入用户名" autocomplete="username" maxlength="64"/>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" class="form-control" id="password" name="password" required
+                           placeholder="请输入密码" autocomplete="current-password" maxlength="128"/>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">登录</button>
+            </form>
+            <hr/>
+            <p class="text-muted small">
+                演示账号：<code>admin</code> / <code>admin123</code> ，或 <code>operator</code> / <code>operator123</code>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>

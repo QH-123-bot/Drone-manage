@@ -1,0 +1,19 @@
+# 无人机管理系统 — SQLite 数据源配置（application-sqlite.yml）
+# 作用：profile=sqlite 时的数据库与环境配置，适合本地开发与演示，无需安装 MySQL。
+# 功能：配置 Druid 连接池、SQLite JDBC 与本地文件库路径、启动时执行 schema-sqlite.sql 初始化表结构。
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:${user.dir}/data/drone.db
+    username: ""
+    password: ""
+    druid:
+      initial-size: 1
+      min-idle: 1
+      max-active: 8
+      test-while-idle: true
+      validation-query: SELECT 1
+    initialization-mode: always
+    schema: classpath:schema-sqlite.sql

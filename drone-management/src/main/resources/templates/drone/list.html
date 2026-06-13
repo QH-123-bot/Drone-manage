@@ -1,0 +1,160 @@
+<!--
+  无人机管理系统 — 无人机列表与条件查询页面（list.html）
+  作用：表现层主业务页面，登录后的默认落地页，展示与管理所有无人机记录。
+  功能：全量/条件查询结果表格、查询表单、新增/详情/编辑/删除操作入口；绑定 drones、query、searchApplied、loginName 等 Model 变量。
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>无人机列表</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+</head>
+<body>
+<!-- 顶部导航：Bootstrap Navbar；loginName 由 GlobalModelAdvice 注入 -->
+<nav class="navbar navbar-inverse navbar-static-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <span class="navbar-brand">无人机管理系统</span>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><p class="navbar-text" th:if="${loginName}">当前用户：<span th:text="${loginName}">user</span></p></li>
+                <li><a th:href="@{/logout}">退出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <!-- Flash / 查询结果提示区：message 为操作成功；error 为校验失败；searchApplied 时显示命中数 -->
+    <div th:if="${message}" class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <span th:text="${message}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div th:if="${searchApplied}" class="alert" th:classappend="${matchCount > 0} ? 'alert-success' : 'alert-warning'" role="alert">
+        <span th:if="${matchCount > 0}" th:text="|查询完成：共找到 ${matchCount} 条符合条件的无人机（条件之间为「且」关系）|"></span>
+        <span th:if="${matchCount == 0}">未找到同时满足所填条件的无人机（文本字段需与库中完全一致）</span>
+    </div>
+
+    <!-- 条件查询表单：POST 到 /drones/query；th:object 绑定 DroneQueryCriteria 与后端字段名一致 -->
+    <div class="panel panel-info">
+        <div class="panel-heading">条件查询（任意填写一项或多项；多项同时为「且」关系；下方表格展示所有匹配记录）</div>
+        <div class="panel-body">
+            <form th:action="@{/drones/query}" th:object="${query}" method="post" class="form-horizontal">
+                <div class="row">
+                    <div class="col-sm-4 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label small">ID</label>
+                            <input type="number" class="form-control input-sm" th:field="*{id}" placeholder="可选"/>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label small">名称</label>
+                            <input type="text" class="form-control input-sm" th:field="*{name}" placeholder="可选"/>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label small">型号</label>
+                            <input type="text" class="form-control input-sm" th:field="*{model}" placeholder="可选"/>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label small">序列号</label>
+                            <input type="text" class="form-control input-sm" th:field="*{serialNumber}" placeholder="可选"/>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label small">续航(分钟)</label>
+                            <input type="number" class="form-control input-sm" th:field="*{maxFlightTime}" placeholder="可选"/>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label small">最大速度</label>
+                            <input type="number" step="0.1" class="form-control input-sm" th:field="*{maxSpeed}" placeholder="可选"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 col-md-2">
+                        <div class="form-group">
+                            <label class="control-label small">状态</label>
+                            <select class="form-control input-sm" th:field="*{status}">
+                                <option value="">（不限制）</option>
+                                <option value="ONLINE">ONLINE</option>
+                                <option value="OFFLINE">OFFLINE</option>
+                                <option value="MAINTENANCE">MAINTENANCE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-8 col-md-10" style="padding-top: 22px;">
+                        <button type="submit" class="btn btn-info btn-sm">查询</button>
+                        <a class="btn btn-default btn-sm" th:href="@{/drones}">清空并重载列表</a>
+                        <a class="btn btn-primary btn-sm" th:href="@{/drones/add}">新增无人机</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 数据表格：th:each 遍历 drones；每行对应实体 Drone 的一行数据库记录 -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>型号</th>
+                <th>序列号</th>
+                <th>续航(分钟)</th>
+                <th>最大速度(km/h)</th>
+                <th>状态</th>
+                <th>备注</th>
+                <th width="200">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(drones)}">
+                <td colspan="9" class="text-center text-muted">
+                    <span th:if="${searchApplied}">无符合条件的数据</span>
+                    <span th:unless="${searchApplied}">暂无数据</span>
+                </td>
+            </tr>
+            <tr th:each="d : ${drones}">
+                <td th:text="${d.id}">1</td>
+                <td th:text="${d.name}">名称</td>
+                <td th:text="${d.model}">型号</td>
+                <td th:text="${d.serialNumber}">SN</td>
+                <td th:text="${d.maxFlightTime}">30</td>
+                <td th:text="${d.maxSpeed}">45</td>
+                <td th:text="${d.status}">ONLINE</td>
+                <td th:text="${d.remark}" style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">-</td>
+                <td>
+                    <a class="btn btn-xs btn-info" th:href="@{/drones/detail/{id}(id=${d.id})}">查看</a>
+                    <a class="btn btn-xs btn-default" th:href="@{/drones/edit/{id}(id=${d.id})}">编辑</a>
+                    <form th:action="@{/drones/delete/{id}(id=${d.id})}" method="post" style="display:inline;"
+                          onsubmit="return confirm('确认删除该无人机？');">
+                        <button type="submit" class="btn btn-xs btn-danger">删除</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>

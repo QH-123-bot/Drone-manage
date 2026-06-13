@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  无人机管理系统 — MyBatis SQL 映射文件（DroneMapper.xml）
+  作用：数据访问层的 SQL 实现，与接口 com.drone.management.mapper.DroneMapper 同一命名空间绑定。
+  功能：定义 resultMap、列清单及 findById/findAll/findByCriteria/insert/update/deleteById 等 SQL；
+        将 drone 表行映射为 Drone 实体，供 DroneServiceImpl 调用。
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drone.management.mapper.DroneMapper">
+
+    <!-- 列 → Java 属性映射；property 为实体字段名，column 为 SQL 列名（下划线风格），把数据库中的信息封装到实体类Drone中 -->
+    <resultMap id="DroneResultMap" type="com.drone.management.entity.Drone">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="model" column="model"/>
+        <result property="serialNumber" column="serial_number"/>
+        <result property="maxFlightTime" column="max_flight_time"/>
+        <result property="maxSpeed" column="max_speed"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 可复用列清单，避免 SELECT * 与多处手写列名不一致 -->
+    <sql id="Base_Column_List">
+        id, name, model, serial_number, max_flight_time, max_speed, status, remark, created_at, updated_at
+    </sql>
+
+    <!-- 对应接口方法 findById：按主键查单条 -->
+    <select id="findById" resultMap="DroneResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM drone WHERE id = #{id}
+    </select>
+
+    <!-- 对应接口方法 findByCriteria：动态 WHERE，参数 q 为 DroneQueryCriteria；多条件 AND -->
+    <select id="findByCriteria" resultMap="DroneResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM drone
+        <where>
+            <if test="q.id != null">
+                AND id = #{q.id}
+            </if>
+            <if test="q.name != null and q.name != ''">
+                AND name = #{q.name}
+            </if>
+            <if test="q.model != null and q.model != ''">
+                AND model = #{q.model}
+            </if>
+            <if test="q.serialNumber != null and q.serialNumber != ''">
+                AND serial_number = #{q.serialNumber}
+            </if>
+            <if test="q.maxFlightTime != null">
+                AND max_flight_time = #{q.maxFlightTime}
+            </if>
+            <if test="q.maxSpeed != null">
+                AND max_speed = #{q.maxSpeed}
+            </if>
+            <if test="q.status != null and q.status != ''">
+                AND status = #{q.status}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <!-- 对应接口方法 findAll：列表默认数据 -->
+    <select id="findAll" resultMap="DroneResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM drone ORDER BY id DESC
+    </select>
+
+    <!-- 对应接口方法 insert：插入后 JDBC 回填主键到实体 id -->
+    <insert id="insert" parameterType="com.drone.management.entity.Drone" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO drone (name, model, serial_number, max_flight_time, max_speed, status, remark, created_at, updated_at)
+        VALUES (#{name}, #{model}, #{serialNumber}, #{maxFlightTime}, #{maxSpeed}, #{status}, #{remark}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <!-- 对应接口方法 update：按 id 更新非主键业务列及 updated_at -->
+    <update id="update" parameterType="com.drone.management.entity.Drone">
+        UPDATE drone SET
+            name = #{name},
+            model = #{model},
+            serial_number = #{serialNumber},
+            max_flight_time = #{maxFlightTime},
+            max_speed = #{maxSpeed},
+            status = #{status},
+            remark = #{remark},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 对应接口方法 deleteById：物理删除一行 -->
+    <delete id="deleteById">
+        DELETE FROM drone WHERE id = #{id}
+    </delete>
+</mapper>

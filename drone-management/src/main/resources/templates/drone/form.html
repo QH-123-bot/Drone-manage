@@ -1,0 +1,98 @@
+<!--
+  无人机管理系统 — 无人机新增/编辑表单页面（form.html）
+  作用：表现层表单视图，用于录入或修改单条无人机档案。
+  功能：th:object 绑定 Drone 实体字段；隐藏域 id 区分新增与更新；提交至 POST /drones/save；展示校验错误信息。
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${formTitle}">表单</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-static-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" th:href="@{/drones}">← 返回列表</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="max-width: 720px;">
+    <h3 th:text="${formTitle}">表单</h3>
+    <!-- 提交地址 /drones/save，字段与实体 Drone 属性一一对应，后端 @Valid 校验 -->
+    <form th:action="@{/drones/save}" th:object="${drone}" method="post" class="form-horizontal">
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="form-group" th:classappend="${#fields.hasErrors('name')} ? 'has-error'">
+            <label class="col-sm-3 control-label">名称 <span class="text-danger">*</span></label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{name}" maxlength="128"/>
+                <span class="help-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">错误</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">型号</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{model}" maxlength="128"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">序列号</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" th:field="*{serialNumber}" maxlength="64"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">最大续航(分钟)</label>
+            <div class="col-sm-9">
+                <input type="number" class="form-control" th:field="*{maxFlightTime}" min="0"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">最大速度(km/h)</label>
+            <div class="col-sm-9">
+                <input type="number" step="0.1" class="form-control" th:field="*{maxSpeed}" min="0"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">状态</label>
+            <div class="col-sm-9">
+                <select class="form-control" th:field="*{status}">
+                    <option value="ONLINE">ONLINE</option>
+                    <option value="OFFLINE">OFFLINE</option>
+                    <option value="MAINTENANCE">MAINTENANCE</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注</label>
+            <div class="col-sm-9">
+                <textarea class="form-control" rows="3" th:field="*{remark}" maxlength="512"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <a class="btn btn-default" th:href="@{/drones}">取消</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>
